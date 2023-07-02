@@ -1,5 +1,8 @@
 :root {
-    --accent-color: rgb(114, 149, 177);
+    --accent-color: rgb(219, 192, 156);
+    --background-color: rgb(139, 88, 58);
+    
+    --move-color: rgb(218, 255, 224);
 }
 
 * {
@@ -22,8 +25,11 @@ img[src=""] {
     display: grid;
     grid-template-rows: repeat(8, auto);
 
-    border: 8px rgb(64, 83, 99) solid;
-    background: #E6E6E6;
+    border: 4px var(--accent-color) solid;
+    box-shadow: 0px 0px 0px 12px var(--background-color);
+    background: var(--background-color);
+
+    margin: 16px;
 }
 
 .row {
@@ -41,22 +47,43 @@ img[src=""] {
     justify-content: center;
 }
 
+
+.captured {
+    width: 64px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+}
+
 .square-image {
     width: 48px;
     height: 48px;
-    z-index: 0;
 }
 
 .picked-up {
     transform: scale(1.05);
     /* transition: 0.5s; */
-    filter: drop-shadow(0px 0px 4px rgba(68, 72, 84, 0.5));
+    filter: drop-shadow(0px 0px 4px rgba(68, 72, 84, 0.424));
 }
 
 .row-even .square:nth-child(even) {
-    background: var(--accent-color);
+    background-color: var(--accent-color);
 }
 
 .row-odd .square:nth-child(odd) {
-    background: var(--accent-color);
+    background-color: var(--accent-color);
+}
+
+.row-even .square:nth-child(even).possible-move {
+    background-color: color-mix(in lch, var(--accent-color), var(--move-color));
+}
+
+.row-odd .square:nth-child(odd).possible-move {
+    background-color: color-mix(in lch, var(--accent-color), var(--move-color));
+}
+
+.possible-move {
+    background-color: var(--move-color);
 }

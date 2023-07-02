@@ -4,10 +4,7 @@ class Queen extends Piece
 {
     type = "queen";
 
-    super()
-    {
-
-    }
+    super() {}
 
     clone()
     {

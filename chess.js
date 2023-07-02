@@ -7,29 +7,46 @@ import Queen from "./classes/pieces/Queen.js";
 import Rook from "./classes/pieces/Rook.js";
 
 const boardElement = document.getElementById("chess-board");
+const whiteCapturedElement = document.getElementById("white-captured");
+const blackCapturedElement = document.getElementById("black-captured");
 
+var whiteCaptured = [];
+var blackCaptured = [];
 var selecting = false;
 var selectedSquare;
 
 var squares = [[],[],[],[],[],[],[],[]];
+// var startingBoard = [
+//     [ "bR","bN","bB","bQ","bK","bB","bN","bR"],
+//     [ "bP","bP","bP","bP","bP","bP","bP","bP"],
+//     [ "","","","","","","",""],
+//     [ "","","","","","","",""],
+//     [ "","","","","","","",""],
+//     [ "","","","","","","",""],
+//     [ "wP","wP","wP","wP","wP","wP","wP","wP"],
+//     [ "wR","wN","wB","wQ","wK","wB","wN","wR"],
+// ];
+
 var startingBoard = [
-    [ "bR","bN","bB","bQ","bK","bB","bN","bR"],
-    [ "bP","bP","bP","bP","bP","bP","bP","bP"],
     [ "","","","","","","",""],
     [ "","","","","","","",""],
     [ "","","","","","","",""],
+    [ "","","","wP","wP","bP","",""],
+    [ "","","","wP","bP","","",""],
     [ "","","","","","","",""],
-    [ "wP","wP","wP","wP","wP","wP","wP","wP"],
-    [ "wR","wN","wB","wQ","wK","wB","wN","wR"],
+    [ "","","","","","","",""],
+    [ "","","","","","","",""]
 ];
 
 const pieceMap = new Map();
-pieceMap.set("P", new Pawn);
-pieceMap.set("N", new Knight);
-pieceMap.set("B", new Bishop);
-pieceMap.set("R", new Rook);
-pieceMap.set("K", new King);
-pieceMap.set("Q", new Queen);
+{
+    pieceMap.set("P", new Pawn);
+    pieceMap.set("N", new Knight);
+    pieceMap.set("B", new Bishop);
+    pieceMap.set("R", new Rook);
+    pieceMap.set("K", new King);
+    pieceMap.set("Q", new Queen);
+}
 
 generateBoard();
 
@@ -60,6 +77,7 @@ function generateBoard()
         
             // Assign fields to square class
             square = new Square(squareElement, squareImage, piece);
+            if (square.piece != null) square.piece.square = square;
             squares[i][j] = square;
 
             squareImage.square = square;
@@ -81,59 +99,78 @@ function getPieceFromNotation(str, boardSquare, pieceMap)
    let piece = pieceMap.get(str[1]).clone();
    piece.color = (str[0] == "w") ? "white" : "black";
    piece.SVG = str + ".svg";
-   piece.square = boardSquare;
    
    return piece;
 }
 
-// Handle picking up and selecting target points
-document.addEventListener("mousedown", function(e)
-{
-    let targetSquare;
-    if (e.target.square != null) targetSquare = e.target.square;
-    else
+
+document.addEventListener("mousedown", function(e) {
+    let target = e.target;
+    let targetSquare = target.square;
+    
+    if (targetSquare == null)
     {
-        selectedSquare = null;
+        if (selecting)
+        {
+            selectedSquare.image.classList.remove("picked-up");
+            selecting = false;
+        }
+
         return;
     }
 
     if (!selecting)
     {
-        selectedSquare = targetSquare;
+        if (targetSquare.piece == null) return;
         selecting = true;
+        selectedSquare = targetSquare;
+        selectedSquare.image.classList.add("picked-up");
     }
-    
     else
     {
-        targetSquare.piece = selectedSquare.piece;
-        selectedSquare.piece = null;
-
-        updateSquare(targetSquare);
-        updateSquare(selectedSquare);
-        
-        selectedSquare = null;
         selecting = false;
-        
+        selectedSquare.image.classList.remove("picked-up");
+
+        if (targetSquare == selectedSquare) return;
+
+        movePiece(selectedSquare, targetSquare);
+
+        selectedSquare = null;
     }
 });
 
-function pickUp(square)
+function movePiece(oldSquare, newSquare)
 {
-    if (selecting) return;
-    selecting = true;
+    // TODO: Implement capturing
+    if (newSquare.piece != null) capture(newSquare.piece);
+
     
-    console.log("picked up", square.piece);
+    newSquare.piece = oldSquare.piece;
+    oldSquare.piece = null;
+    newSquare.piece.square = newSquare;
 
-    document.addEventListener("mousedown", function(e) {
-        let targetSquare = e.target.square;
-
-        targetSquare.piece = square.piece;
-        updateSquare(targetSquare);
-        selecting = false;
-    }, {once: true});
+    updateSquare(oldSquare);
+    updateSquare(newSquare);
 }
 
 function updateSquare(square)
 {
     square.image.src = (square.piece != null) ? `assets/${square.piece.SVG}` : "";
 }
+
+function capture(piece)
+{
+    switch (piece.color)
+    {
+        case "white":
+            blackCaptured.push(piece);
+            console.log(piece);
+            blackCapturedElement.appendChild(piece.square.image.cloneNode(true));
+            break;
+        case "black":
+            whiteCaptured.push(piece);
+            whiteCapturedElement.appendChild(piece.square.image.cloneNode(true));
+            break;
+    }
+}
+

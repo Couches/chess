@@ -4,6 +4,8 @@ class Piece {
     SVG;
     square;
 
+    hasMoved = false;
+
     constructor()
     {
         

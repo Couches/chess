@@ -4,10 +4,7 @@ class Rook extends Piece
 {
     type = "rook";
 
-    super()
-    {
-
-    }
+    super() {}
 
     clone()
     {

@@ -4,10 +4,7 @@ class Pawn extends Piece
 {
     type = "pawn";
 
-    super()
-    {
-
-    }
+    super() {}
 
     clone()
     {

@@ -4,10 +4,7 @@ class Bishop extends Piece
 {
     type = "bishop";
 
-    super()
-    {
-
-    }
+    super() {}
 
     clone()
     {
